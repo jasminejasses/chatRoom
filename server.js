@@ -18,8 +18,10 @@ user-side
     u:message
     u:disconnect
 server-side
-    s:allMessages
-    s:message*/
+    s:newUserData
+    s:message
+    s:userlistUpdate
+*/
 
 /*Anatomy of a message-object
 {
@@ -35,20 +37,53 @@ server-side
 let messageHistory = [];
 let allUsers = [];
 
+//A simple function to generate a random number for the usernames
 function randomNr() {
     return Math.floor(Math.random) * Math.floor(9999);
 }
 
 function saveUser(websocket) {
+
+    //Create a username
     let username = `User #${randomNr()}`;
+
+    //Loop through all users in allUsers. If their name is the same as the one just generated
+    //generate a new one and loop through all of the users again
+    for (let i = 0; i < allUsers.length; i++) {
+        if (allUsers[i].username == username) {
+            username == `User #${randomNr()}`;
+            i = 0;
+        }
+    }
+
+    //Save the user with their name and socket in a object in allUsers and return the name
     let user = {"username": username, "socket": websocket};
     allUsers.push(user);
+    return username;
 }
 
-function sendPrivate(websocket) {
+function newUserHandling(websocket) {
+
+    //Create, save and get a new username
+    let username = saveUser(websocket);
+
+    //Create a object that contains the username and the saved chathistory
+    let newUserObject = {
+        "type": "s:newUserData",
+        "data": {
+            "username": username,
+            "messageHistory": messageHistory
+        }
+    }
+
+    //Send the object only to the new user
+    sendPrivate(websocket, newUserObject);
+}
+
+function sendPrivate(websocket, messageObj) {
 
     //Create a stringified message-object
-    privMessage = JSON.stringify({"type": 's:allMessages', "data": messageHistory});
+    privMessage = JSON.stringify(messageObj);
 
     //Send the message-object
     websocket.send(privMessage);
@@ -57,7 +92,7 @@ function sendPrivate(websocket) {
 function sendPublic(server, message) {
 
     //Create a stringified message-object
-    publMessage = JSON.stringify({"type": 's:message', "data": message});
+    publMessage = JSON.stringify(message);
 
     //Loop through all of the connected users...
     server.clients.forEach(currClient => {
@@ -69,29 +104,60 @@ function sendPublic(server, message) {
     });
 }
 
+function sendMessage(server, message) {
+
+    //Parse the message
+    parsedMessage = JSON.parse(message.data);
+
+    //Store the data-part
+    messageHistory.push(parsedMessage.data);
+
+    //Change the type of the message
+    parsedMessage.type = "s:message";
+
+    //Send the message to all the users
+    sendPublic(server, parsedMessage);
+}
+
+function sendUserListUpdate(server) {
+
+    //Create a message-object with the correct type and that contains the updated list of all the users
+    let userListUpdateObj = {
+        "type": "s:userlistUpdate",
+        "data": allUsers
+    }
+
+    //Send the object to all users
+    sendPublic(server, userListUpdateObj);
+}
+
 server.on('connection', (websocket) => {
     console.log('user has connected!');
 
-    //Add them to the user-list
-    saveUser(websocket);
+    /*This function handles all the stuff that comes with a new user; creating a username,
+    saving that in the user-list and sending that and the chat-history to them*/
+    newUserHandling(websocket);
 
-    //Send all previous messages to them
-    sendPrivate(websocket);
+    //This function sends the updated userlist to all users
+    sendUserListUpdate(server);
 
     //Server recieves a message from a user
     websocket.on('message', (message) => {
-
-        //Parse the "data"-part of the message
-        parsedMessage = JSON.parse(message.data);
-
-        //Store the data-part
-        messageHistory.push(parsedMessage);
-
-        //Send the message to all the users
-        sendPublic(server, parsedMessage);
+        sendMessage(server, message);
     });
 
+    //Someone disconnects
     websocket.on('close', (websocket) => {
-        
-    })
+
+        //Loop through all users and if their websocket matches the one that just disconnected remove them from the list
+        allUsers.forEach(user => {
+            if(user.websocket == websocket) {
+                let index = allUsers.indexOf(user);
+                allUsers.splice(index, 1);
+            }
+        });
+
+        //Send the updated list to all users
+        sendUserListUpdate(server);
+    });
 });
