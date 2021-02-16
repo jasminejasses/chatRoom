@@ -103,7 +103,7 @@ const ACTIONS = {
 
 // Skapa en WebSocket-server
 // Ska lyssna till open, message, close
-const socket = new WebSocket('ws://localhost:6942');
+const socket = new WebSocket('ws://localhost:4269');
 // Vid connect
 socket.addEventListener('open', () => {
     console.log('Opened');

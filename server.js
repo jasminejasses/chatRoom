@@ -39,10 +39,10 @@ let allUsers = [];
 
 //A simple function to generate a random number for the usernames
 function randomNr() {
-    return Math.floor(Math.random) * Math.floor(9999);
+    return Math.floor(Math.random() * 9999);
 }
 
-function saveUser(websocket) {
+function saveUser() {
 
     //Create a username
     let username = `User #${randomNr()}`;
@@ -57,7 +57,7 @@ function saveUser(websocket) {
     }
 
     //Save the user with their name and socket in a object in allUsers and return the name
-    let user = {"username": username, "socket": websocket};
+    let user = {"username": username};
     allUsers.push(user);
     return username;
 }
@@ -65,7 +65,7 @@ function saveUser(websocket) {
 function newUserHandling(websocket) {
 
     //Create, save and get a new username
-    let username = saveUser(websocket);
+    let username = saveUser();
 
     //Create a object that contains the username and the saved chathistory
     let newUserObject = {
@@ -78,6 +78,7 @@ function newUserHandling(websocket) {
 
     //Send the object only to the new user
     sendPrivate(websocket, newUserObject);
+    return username;
 }
 
 function sendPrivate(websocket, messageObj) {
@@ -90,6 +91,8 @@ function sendPrivate(websocket, messageObj) {
 }
 
 function sendPublic(server, message) {
+
+    console.log(message);
 
     //Create a stringified message-object
     publMessage = JSON.stringify(message);
@@ -107,7 +110,7 @@ function sendPublic(server, message) {
 function sendMessage(server, message) {
 
     //Parse the message
-    parsedMessage = JSON.parse(message.data);
+    parsedMessage = JSON.parse(message);
 
     //Store the data-part
     messageHistory.push(parsedMessage.data);
@@ -135,8 +138,9 @@ server.on('connection', (websocket) => {
     console.log('user has connected!');
 
     /*This function handles all the stuff that comes with a new user; creating a username,
-    saving that in the user-list and sending that and the chat-history to them*/
-    newUserHandling(websocket);
+    saving that in the user-list and sending that and the chat-history to them.
+    We need to save the name in a variable so that we can reach it and compare to it when a user disconnects*/
+    const username = newUserHandling(websocket);
 
     //This function sends the updated userlist to all users
     sendUserListUpdate(server);
@@ -147,11 +151,12 @@ server.on('connection', (websocket) => {
     });
 
     //Someone disconnects
-    websocket.on('close', (websocket) => {
+    websocket.on('close', () => {
 
-        //Loop through all users and if their websocket matches the one that just disconnected remove them from the list
+        /*Loop through all users and, if their username matches the one we saved in a variable when
+        they connected, remove them from the list*/
         allUsers.forEach(user => {
-            if(user.socket == websocket) {
+            if(user.username == username) {
                 let index = allUsers.indexOf(user);
                 allUsers.splice(index, 1);
             }
