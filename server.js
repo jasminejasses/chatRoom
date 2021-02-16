@@ -151,7 +151,7 @@ server.on('connection', (websocket) => {
 
         //Loop through all users and if their websocket matches the one that just disconnected remove them from the list
         allUsers.forEach(user => {
-            if(user.websocket == websocket) {
+            if(user.socket == websocket) {
                 let index = allUsers.indexOf(user);
                 allUsers.splice(index, 1);
             }
