@@ -12,16 +12,16 @@ function updateScroll(){
 
 // Funktion som skapar en chattbubbla
 function createBubbe(message){
-    console.log(message)
+    console.log(message.content.name)
     let bubble = document.createElement('div');
     bubble.setAttribute('class', 'message'); //ownMessage
     let sender = document.createElement('div');
     // -------------------------------------
-    sender.innerHTML = message.time+'. '+message.name + ':';
+    sender.innerHTML = message.content.time+'. '+message.content.name + ':';
     sender.setAttribute('class', 'sender');
     let theText = document.createElement('div');
     theText.setAttribute('class', 'text');
-    theText.innerHTML = message.text;
+    theText.innerHTML = message.content.text;
     bubble.append(sender, theText); 
     return bubble;
 }
@@ -34,7 +34,6 @@ function postMessage(message) {
 // Funktion för att placera ett nytt meddelande i chatten (onödigt mellanled?)
 function chatMessage(data) {
     postMessage(data);
-    console.log(data)
 } 
 // Funktion för att placera history i chatten vid connect
 function chatHistory(data) {
@@ -158,8 +157,8 @@ inputText.addEventListener('keyup', (event) => {
         let message = { text: textFromInput, time: time(), name: 'You' };
     
         // Send the message to the server as a chat:message
-        send({ action: 'chat:message', content: message });
-        postMessage(message);
+        send({ type: 'chat:message', content: message });
+        //postMessage(message);
     
         // Clear the input field
         inputText.value = '';
