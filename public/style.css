@@ -78,7 +78,7 @@ wrapper {
     border-radius: 100px;
     background-color: rgb(0, 0, 0);
     border: 2px solid rgb(66, 66, 66);
-    background-image: url(images/groupImg.jpg);
+    background-image: url(../images/groupImg.jpg);
     background-size: 300%;
     background-position: center;
 }
@@ -135,7 +135,7 @@ wrapper {
 
     background-color: rgb(0, 0, 0);
     border: 2px solid rgb(66, 66, 66);
-    background-image: url(images/queen_face.png);
+    background-image: url(../images/queen_face.png);
     background-size: cover;
     background-position: center;
 }
