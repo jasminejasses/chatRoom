@@ -33,7 +33,7 @@ function postMessage(message) {
 }
 // Funktion för att placera ett nytt meddelande i chatten (onödigt mellanled?)
 function chatMessage(data) {
-    //postMessage(data);
+    postMessage(data);
     console.log(data)
 } 
 // Funktion för att placera history i chatten vid connect
