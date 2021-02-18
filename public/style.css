@@ -111,7 +111,6 @@ wrapper {
 .ownMessage > .text {
     background: rgb(26,211,181);
     background: linear-gradient(90deg, rgb(14, 138, 107) 0%, rgb(31, 109, 117) 54%, rgba(6,86,95,1) 100%);
-    margin-left: 65%;
     margin-right: 1vw;
 }
 /* ------- Denna ska redigeras sen*/

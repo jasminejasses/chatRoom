@@ -12,11 +12,11 @@ function updateScroll(){
 
 // Funktion som skapar en chattbubbla
 function createBubbe(message){
+    console.log(message)
     let bubble = document.createElement('div');
-    bubble.setAttribute('class', 'message ownMessage');
+    bubble.setAttribute('class', 'message'); //ownMessage
     let sender = document.createElement('div');
-    // --------------------------------------------Ändra så sender blir den som skickar 
-    // - om det är en själv så ska den även få klassen .ownMessage-----------------------------------------
+    // -------------------------------------
     sender.innerHTML = message.time+'. '+message.name + ':';
     sender.setAttribute('class', 'sender');
     let theText = document.createElement('div');
@@ -33,11 +33,13 @@ function postMessage(message) {
 }
 // Funktion för att placera ett nytt meddelande i chatten (onödigt mellanled?)
 function chatMessage(data) {
-    postMessage(data);
+    //postMessage(data);
+    console.log(data)
 } 
 // Funktion för att placera history i chatten vid connect
 function chatHistory(data) {
-    data.messageHistory.forEach((message) => {
+    let messageHistory = data.data.messageHistory
+    messageHistory.forEach((message) => {
       postMessage(message);
     });
 }
@@ -47,8 +49,9 @@ function userList(message) {
     usersWrapper.innerHTML = '';
     // Tar ut datan från message-obj från servern
     let list = message.data;
+    console.log(list)
     // Går igenom alla users (med den nya tillagd eller borttagen) o appendar dem på nytt
-    list.users.forEach((user) => {
+    list.forEach((user) => {
         let userDiv = document.createElement('div');
         let userName = document.createElement('div');
         let dot = document.createElement('div');
@@ -58,6 +61,7 @@ function userList(message) {
         dot.className = 'dot';
         userName.innerHTML = user.username;
 
+        userDiv.append(userName, dot)
         usersWrapper.append(userDiv);
     });
 }
@@ -115,10 +119,11 @@ socket.addEventListener('close', () => {
 // Vid skrivet meddelande
 socket.addEventListener('message', (event) => {
     let data = JSON.parse(event.data);
+    console.log(data)
     // Check if 
     if (ACTIONS[data.type] !== undefined) {
       // Call the action with the received payload ------ vet inte vad data.payload ska va? bara data?
-      ACTIONS[data.type](data.payload);
+      ACTIONS[data.type](data);
     }
 });
 

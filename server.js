@@ -34,7 +34,7 @@ server-side
 }*/
 
 //Define the arrays that will hold the different kinds of content
-let messageHistory = [];
+let messageHistory = ['Say hello!'];
 let allUsers = [];
 
 //A simple function to generate a random number for the usernames
