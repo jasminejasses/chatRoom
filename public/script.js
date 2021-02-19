@@ -16,6 +16,7 @@ function updateScroll(){
 // Funktion som skapar en chattbubbla
 function createBubbe(message){
     console.log(message.content.name)
+    
     let bubble = document.createElement('div');
     bubble.setAttribute('class', 'message'); //ownMessage
     let sender = document.createElement('div');
@@ -62,7 +63,6 @@ function userList(message) {
     usersWrapper.innerHTML = '';
     // Tar ut datan från message-obj från servern
     let list = message.data;
-    console.log(list)
     // Går igenom alla users (med den nya tillagd eller borttagen) o appendar dem på nytt
     list.forEach((user) => {
         let userDiv = document.createElement('div');
@@ -140,25 +140,10 @@ socket.addEventListener('message', (event) => {
     }
 });
 
-
-
-
-
-
-
-
-
 function send(messageToServer) {
     // Stringify to send it to webSocket-server
     socket.send(JSON.stringify(messageToServer));
-  }
-
-
-
-
-// Funktion som tar emot serverns svar och appendar det på sidan
-
-
+}
 
 // Lägg till knapp-event?
 inputText.addEventListener('keyup', (event) => {

@@ -36,6 +36,7 @@ server-side
 //Define the arrays that will hold the different kinds of content
 let messageHistory = ['Say hello!'];
 let allUsers = [];
+let thisUser;
 
 //A simple function to generate a random number for the usernames
 function randomNr() {
@@ -59,6 +60,7 @@ function saveUser() {
     //Save the user with their name and socket in a object in allUsers and return the name
     let user = {"username": username};
     allUsers.push(user);
+    thisUser = user;
     return username;
 }
 
@@ -92,7 +94,9 @@ function sendPrivate(websocket, messageObj) {
 
 function sendPublic(server, message) {
 
-    console.log(message);
+    console.log(message.name);
+    console.log(thisUser);
+    message.content.name = thisUser;
 
     //Create a stringified message-object
     publMessage = JSON.stringify(message);
