@@ -1,5 +1,8 @@
 'use strict';
 
+//Create global variable that will store the name assigned to the client by the server
+let myName;
+
 // Funktion som skapar tid för messagen
 function time() {
     const d = new Date();
@@ -17,7 +20,15 @@ function createBubbe(message){
     bubble.setAttribute('class', 'message'); //ownMessage
     let sender = document.createElement('div');
     // -------------------------------------
-    sender.innerHTML = message.content.time+'. '+message.content.name + ':';
+
+    /*If the sender has the same name as that stored in the global variable the message is from "me"
+    and the sender is set as "You" and the bubble gets the class "ownMessage"*/
+    if (message.content.name == myName) {
+        sender.innerHTML = message.content.time+'. You:';
+        bubble.setAttribute('class', 'ownMessage');
+    } else {
+        sender.innerHTML = message.content.time+'. '+message.content.name + ':';
+    }
     sender.setAttribute('class', 'sender');
     let theText = document.createElement('div');
     theText.setAttribute('class', 'text');
@@ -35,8 +46,11 @@ function postMessage(message) {
 function chatMessage(data) {
     postMessage(data);
 } 
-// Funktion för att placera history i chatten vid connect
+// Funktion för att placera history i chatten vid connect och spara användarnamnet
 function chatHistory(data) {
+
+    //Put the assigned username in myName
+    myName = data.data.username;
     let messageHistory = data.data.messageHistory
     messageHistory.forEach((message) => {
       postMessage(message);
@@ -154,7 +168,7 @@ inputText.addEventListener('keyup', (event) => {
         let textFromInput = inputText.value;
   
         // Create the message to the server
-        let message = { text: textFromInput, time: time(), name: 'You' };
+        let message = { text: textFromInput, time: time(), name: myName };
     
         // Send the message to the server as a chat:message
         send({ type: 'chat:message', content: message });
